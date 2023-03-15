@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Sign In with Auth0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+      rel="stylesheet"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+  </head>
+  <style>
+    body,
+    html {
+      height: 100%;
+      background-color: #f9f9f9;
+    }
+
+    .login-container {
+      background-image: url('https://drive.google.com/uc?export=view&id=18mg1OB8VJ1QnPJ2npgUXf7q6h3-DkNYl');
+      background-size: cover;
+      position: relative;
+      height: 100%;
+    }
+
+    .login-card {
+      background: rgba(240, 240, 240, 0.6) !important;
+    }
+
+    .login-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      background: #f0f0f0;
+      padding: 40px;
+      box-shadow: 2px 2px 20px lightgrey;
+      border-radius: 0.5rem 0px 0px 0.5rem;
+    }
+
+    .recover-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      height: 100%;
+      background: #f0f0f0;
+      padding: 40px;
+      box-shadow: 2px 2px 20px lightgrey;
+      border-radius: 0.5rem 0px 0px 0.5rem;
+    }
+
+    .login-header {
+      text-align: center;
+    }
+
+    .login-form {
+      max-width: 270px;
+    }
+
+    .recover-form {
+      max-width: 270px;
+    }
+
+    .login-header img {
+      width: 75px;
+    }
+
+    #error-message {
+      display: none;
+      white-space: break-spaces;
+    }
+  </style>
+  <body>
+    <div id="app">
+      <v-app>
+        <v-main>
+          <v-container fill-height fluid class="pa-0 login-container">
+            <v-row class="fill-height" justify="center" align="center">
+              <v-card
+                flat
+                class="login-card rounded-lg"
+                height="85%"
+                :width="$vuetify.breakpoint.xs ? '80%' : '55%'"
+              >
+                <v-row class="fill-height" no-gutters>
+                  <v-col cols="12" lg="6">
+                    <div v-show="boxToShow == 'login'" class="login-box">
+                      <div class="login-header">
+                        <img
+                          src="https://drive.google.com/uc?export=view&id=1PN1809QPVPk3noTD1ln4nrgd_lqPPqOI"
+                        />
+                        <h3>¡Bienvenido!</h3>
+                        <h5>Ingresar tus datos registrados con nosotros</h5>
+                      </div>
+                      <div id="error-message" class="alert alert-danger"></div>
+                      <form
+                        class="mx-8 login-form"
+                        onsubmit="return false;"
+                        method="post"
+                      >
+                        <div class="form-group my-8">
+                          <v-text-field
+                            id="email"
+                            dense
+                            outlined
+                            hide-details
+                            label="Correo electrónico"
+                            placeholder="Ingresar correo electrónico"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <v-text-field
+                            id="password"
+                            dense
+                            outlined
+                            hide-details
+                            label="Contraseña"
+                            placeholder="Ingresar contraseña"
+                            :type="showPassword ? 'text' : 'password'"
+                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            @click:append="showPassword = !showPassword"
+                          />
+                        </div>
+                        <div class="text-center">
+                          <span
+                            class="primary--text"
+                            style="cursor: pointer"
+                            @click="boxToShow = 'recover'"
+                          >
+                            ¿Olvidaste tu contraseña?
+                          </span>
+                        </div>
+                        <div class="captcha-container form-group"></div>
+                        <v-btn
+                          id="btn-login"
+                          type="submit"
+                          width="100%"
+                          color="#0093B1"
+                          class="white--text my-4"
+                        >
+                          Ingresar
+                        </v-btn>
+                        <v-btn
+                          id="btn-google"
+                          width="100%"
+                          outlined
+                          color="#0093B1"
+                        >
+                          Ingresar con Google
+                        </v-btn>
+                      </form>
+                    </div>
+                    <div v-show="boxToShow == 'recover'" class="recover-box">
+                      <div class="login-header">
+                        <img
+                          src="https://drive.google.com/uc?export=view&id=1PN1809QPVPk3noTD1ln4nrgd_lqPPqOI"
+                        />
+                        <h3>Recuperar contraseña</h3>
+                        <h5>
+                          Ingresa el correo con el que te registraste y te
+                          enviaremos las instrucciones para recuperar tu
+                          contraseña
+                        </h5>
+                      </div>
+                      <div id="error-message" class="alert alert-danger"></div>
+                      <form
+                        class="mx-8 recover-form"
+                        onsubmit="return false;"
+                        method="post"
+                      >
+                        <div class="form-group my-8">
+                          <v-text-field
+                            id="recover-email"
+                            dense
+                            outlined
+                            hide-details
+                            label="Correo electrónico"
+                            placeholder="Ingresar correo electrónico"
+                          />
+                        </div>
+                        <div class="captcha-container form-group"></div>
+                        <v-btn
+                          id="btn-reset"
+                          type="submit"
+                          width="100%"
+                          color="#0093B1"
+                          class="white--text"
+                        >
+                          Recuperar
+                        </v-btn>
+                      </form>
+                    </div>
+                    <div
+                      v-show="boxToShow == 'recover-message'"
+                      class="recover-box"
+                    >
+                      <div class="login-header">
+                        <img
+                          src="https://drive.google.com/uc?export=view&id=1PN1809QPVPk3noTD1ln4nrgd_lqPPqOI"
+                        />
+                        <h3 class="mt-12">¡Listo!</h3>
+                        <h5>
+                          Hemos enviado las instrucciones a tu correo. Revisa en
+                          tu bandeja principal, si no lo ves revisa en tus
+                          spams.
+                        </h5>
+                      </div>
+                      <div id="error-message" class="alert alert-danger"></div>
+                      <form
+                        class="mx-8 mt-4 recover-form"
+                        onsubmit="return false;"
+                        method="post"
+                      >
+                        <v-btn
+                          id="btn-go-to-login"
+                          width="100%"
+                          color="#0093B1"
+                          class="white--text"
+                        >
+                          Ir al Login
+                        </v-btn>
+                      </form>
+                    </div>
+                  </v-col>
+                  <v-col lg="6" v-if="$vuetify.breakpoint.lgAndUp">
+                    <v-row class="fill-height pa-12" no-gutters align="center">
+                      <div>
+                        <h1>
+                          Somos tu
+                          <span style="color: #0093b1">partner digital</span>
+                        </h1>
+                        <h5>
+                          Ofrecemos soluciones tecnológicas para optimizar la
+                          comunicación y difusión de tus procesos.
+                        </h5>
+                      </div>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-row>
+          </v-container>
+        </v-main>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0/9.16/auth0.min.js"></script>
+    <script src="https://cdn.auth0.com/js/polyfills/1.0/object-assign.min.js"></script>
+    <script>
+      var vue = new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        data: () => ({
+          showPassword: false,
+          boxToShow: 'login',
+        }),
+        methods: {
+          changeBoxToShow(boxToShow) {
+            this.boxToShow = boxToShow
+          },
+        },
+      })
+      window.addEventListener('load', function () {
+        var config = JSON.parse(
+          decodeURIComponent(escape(window.atob('@@config@@')))
+        )
+
+        var leeway = config.internalOptions.leeway
+        if (leeway) {
+          var convertedLeeway = parseInt(leeway)
+
+          if (!isNaN(convertedLeeway)) {
+            config.internalOptions.leeway = convertedLeeway
+          }
+        }
+
+        var params = Object.assign(
+          {
+            overrides: {
+              __tenant: config.auth0Tenant,
+              __token_issuer: config.authorizationServer.issuer,
+            },
+            domain: config.auth0Domain,
+            clientID: config.clientID,
+            redirectUri: config.callbackURL,
+            responseType: 'code',
+          },
+          config.internalOptions
+        )
+
+        var webAuth = new auth0.WebAuth(params)
+        var databaseConnection = 'Username-Password-Authentication'
+        var captcha = webAuth.renderCaptcha(
+          document.querySelector('.captcha-container')
+        )
+
+        function login(e) {
+          e.preventDefault()
+          var button = this
+          var username = document.getElementById('email').value
+          var password = document.getElementById('password').value
+          button.disabled = true
+          webAuth.login(
+            {
+              realm: databaseConnection,
+              username: username,
+              password: password,
+              captcha: captcha.getValue(),
+            },
+            function (err) {
+              if (err) displayError(err)
+              button.disabled = false
+            }
+          )
+        }
+
+        function signup() {
+          var button = this
+          var email = document.getElementById('email').value
+          var password = document.getElementById('password').value
+
+          button.disabled = true
+          webAuth.redirect.signupAndLogin(
+            {
+              connection: databaseConnection,
+              email: email,
+              password: password,
+              captcha: captcha.getValue(),
+            },
+            function (err) {
+              if (err) displayError(err)
+              button.disabled = false
+            }
+          )
+        }
+
+        function loginWithGoogle() {
+          webAuth.authorize(
+            {
+              connection: 'google-oauth2',
+            },
+            function (err) {
+              if (err) displayError(err)
+            }
+          )
+        }
+
+        function resetPassword(e) {
+          e.preventDefault()
+          var email = document.getElementById('recover-email').value
+          if (!email) {
+            alert('Por favor, introduce tu correo electrónico.')
+            return
+          }
+          webAuth.changePassword(
+            {
+              connection: databaseConnection,
+              email: email,
+            },
+            function (err, resp) {
+              if (err) {
+                console.log(err.message)
+                alert(err.message)
+              } else {
+                vue.changeBoxToShow('recover-message')
+                console.log(resp)
+              }
+            }
+          )
+        }
+
+        function goToLogin() {
+          vue.changeBoxToShow('login')
+        }
+
+        function displayError(err) {
+          captcha.reload()
+          var errorMessage = document.getElementById('error-message')
+          errorMessage.innerHTML = err.policy || err.description
+          errorMessage.style.display = 'block'
+        }
+
+        document.getElementById('btn-login').addEventListener('click', login)
+        document
+          .getElementById('btn-google')
+          .addEventListener('click', loginWithGoogle)
+        document
+          .getElementById('btn-reset')
+          .addEventListener('click', resetPassword)
+        document
+          .getElementById('btn-go-to-login')
+          .addEventListener('click', goToLogin)
+        document.getElementById('btn-signup').addEventListener('click', signup)
+      })
+    </script>
+  </body>
+</html>
